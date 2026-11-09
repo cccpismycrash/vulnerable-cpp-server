@@ -1,0 +1,4 @@
+.PVS-Studio
+.vscode
+build/*
+!build/server
