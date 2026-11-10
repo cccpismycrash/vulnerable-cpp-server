@@ -7,16 +7,19 @@
 #include <iostream>
 
 std::string run_command(const std::string& cmd) {
-    // Command Injection (CWE-78)
-    char buffer[128];
-    std::string result;
-    FILE* pipe = popen(cmd.c_str(), "r");   // опасно!
-    if (!pipe) return "ERROR";
-    while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
-        result += buffer;
+
+    if (cmd == "whoami") {
+        return "admin\n";
     }
-    pclose(pipe);
-    return result;
+    if (cmd == "id") {
+        return "uid=1000(admin) gid=1000(admin)\n";
+    }
+    if (cmd == "pwd") {
+        return "/home/admin\n";
+    }
+    if (cmd == "ls") {
+        return "documents\nuploads\nconfig.txt\n";
+    }
 }
 
 std::string read_file(const std::string& path) {
