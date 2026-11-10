@@ -35,7 +35,7 @@ std::string search_documents(const std::string& query) {
     
     // Более явная уязвимость:
     char result_buf[512];
-    sprintf(result_buf, query.c_str());   // CWE-134
+    snprintf(result_buf, sizeof(result_buf), "%s", query.c_str());   // CWE-134
 
     std::string result = "Search results for: ";
     result += result_buf;
