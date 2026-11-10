@@ -31,7 +31,7 @@ std::string search_documents(const std::string& query) {
     // Format String Vulnerability (CWE-134)
     char buffer[256];
     // Намеренно опасно: пользовательский ввод как format-string
-    snprintf(buffer, sizeof(buffer), query.c_str());  // всё равно опасно при %n и т.п.
+    snprintf(buffer, sizeof(buffer), "%s", query.c_str());  // всё равно опасно при %n и т.п.
     
     // Более явная уязвимость:
     char result_buf[512];
