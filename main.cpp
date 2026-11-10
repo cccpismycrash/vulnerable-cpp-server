@@ -7,6 +7,7 @@
 #include <map>
 #include <string>
 #include <filesystem>
+#include <sstream>
 
 namespace fs = std::filesystem;
 
@@ -46,7 +47,36 @@ int main() {
         try {
             int id = std::stoi(req.matches[1].str());
             auto* doc = get_document(id);
+
+            // идентифицируем пользователя по сессионной куке
+            std::string cookie = req.get_header_value("Cookie");
+            if (cookie.empty()) {
+                res.status = 401;
+                res.set_content("Unauthorized", "text/plain");
+                return;
+            }
+            std::istringstream stream(cookie);
+            std::string key, value;
+            std::getline(stream, key, '=');
+            std::getline(stream, value, ';');
+            if (key != "session") {
+                res.status = 401;
+                res.set_content("Unauthorized", "text/plain");
+                return;
+            }
+            auto it = sessions.find(value);
+            if (value.empty() || it == sessions.end()) {
+                res.status = 401;
+                res.set_content("Unauthorized", "text/plain");
+                return;
+            }
+            User user = it->second;
             if (doc) {
+                if (doc->owner_id != user.id && user.role != "admin") {
+                    res.status = 403;
+                    res.set_content("Forbidden", "text/plain");
+                    return;
+                }
                 res.set_content("File: " + doc->filename + "\nOwner ID: " + std::to_string(doc->owner_id) +
                                 "\n\n" + doc->content, "text/plain");
             } else {
