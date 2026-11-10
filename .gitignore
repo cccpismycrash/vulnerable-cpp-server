@@ -5,3 +5,4 @@ build/*
 .txt
 .tasks
 .log
+secrets.conf

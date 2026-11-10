@@ -13,6 +13,11 @@ namespace fs = std::filesystem;
 std::map<std::string, User> sessions;   // session_id → user
 
 int main() {
+
+    if (Config::load() != 0) {
+        return 1;
+    }
+
     // Создаём папку для загрузок
     fs::create_directories(Config::UPLOAD_DIR);
 
