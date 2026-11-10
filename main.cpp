@@ -46,8 +46,7 @@ int main() {
     svr.Get(R"(/document/(\d+))", [](const httplib::Request& req, httplib::Response& res) {
         try {
             int id = std::stoi(req.matches[1].str());
-            auto* doc = get_document(id);
-
+            
             // идентифицируем пользователя по сессионной куке
             std::string cookie = req.get_header_value("Cookie");
             if (cookie.empty()) {
@@ -71,6 +70,7 @@ int main() {
                 return;
             }
             User user = it->second;
+            auto* doc = get_document(id, &user);
             if (doc) {
                 if (doc->owner_id != user.id && user.role != "admin") {
                     res.status = 403;

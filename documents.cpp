@@ -12,10 +12,12 @@ void init_documents() {
     docs.push_back({3, 3, "bob_data.txt", "Bob information"});
 }
 
-Document* get_document(int id) {
-    // IDOR (CWE-639) — нет проверки владельца / прав доступа
+Document* get_document(int id, const User* user) {
+    if (user == nullptr)
+        return nullptr;
+
     for (auto& d : docs) {
-        if (d.id == id) {
+        if (d.id == id && d.owner_id == user->id) {
             return &d;
         }
     }
