@@ -18,13 +18,18 @@ static DbUser users[] = {
 };
 
 std::optional<User> login(const std::string& username, const std::string& password) {
-    // Buffer Overflow (CWE-120) + небезопасное сравнение
     char user_buf[32];
     char pass_buf[32];
 
-    // Намеренно опасные вызовы
-    strcpy(user_buf, username.c_str());
-    strcpy(pass_buf, password.c_str());
+    if (
+        username.size() >= sizeof(user_buf) ||
+        password.size() >= sizeof(pass_buf)
+    ) {
+        return std::nullopt;
+    }
+
+    std::memcpy(user_buf, username.c_str(), username.size() + 1);
+    std::memcpy(pass_buf, password.c_str(), password.size() + 1);
 
     for (const auto& u : users) {
         if (strcmp(user_buf, u.username) == 0 && strcmp(pass_buf, u.password) == 0) {

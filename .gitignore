@@ -2,3 +2,6 @@
 .vscode
 build/*
 !build/server
+.txt
+.tasks
+.log
