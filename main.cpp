@@ -105,7 +105,11 @@ int main() {
             res.set_content("filename required", "text/plain");
             return;
         }
-        save_file(filename, content);
+        if (!save_file(filename, content)) {
+            res.status = 403;
+            res.set_content("Access denied or save failed", "text/plain");
+            return;
+        }
         res.set_content("Uploaded: " + filename, "text/plain");
     });
 
