@@ -33,9 +33,9 @@ std::string read_file(const std::string& path) {
 }
 
 void save_file(const std::string& filename, const std::string& content) {
-    // Path Traversal при сохранении
-    std::string full_path = Config::UPLOAD_DIR + filename;
-    std::ofstream out(full_path);
+    auto path = valid_path(filename);
+    if (!path) return;
+    std::ofstream out(*path);
     if (out) {
         out << content;
     }
