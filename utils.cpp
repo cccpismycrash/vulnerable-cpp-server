@@ -5,6 +5,9 @@
 #include <sstream>
 #include <cstring>
 #include <iostream>
+#include <sodium.h>
+#include <array>
+#include <stdexcept>
 
 std::string run_command(const std::string& cmd) {
 
@@ -43,12 +46,23 @@ bool save_file(const std::string& filename, const std::string& content) {
     return false;
 }
 
-std::string encrypt(const std::string& data) {
-    // Очень слабое "шифрование" (CWE-327 / CWE-326)
-    std::string result = data;
-    for (char& c : result) {
-        c ^= 0x42;
-    }
+std::optional<std::string> encrypt(const std::string& data) {
+    if (sodium_init() < 0) return std::nullopt;
+    unsigned char key[crypto_secretbox_KEYBYTES];
+    std::ifstream file(".key", std::ios::binary);
+    if (!file.read(reinterpret_cast<char*>(key), sizeof key))
+        return std::nullopt;
+    std::string result(
+        crypto_secretbox_NONCEBYTES + crypto_secretbox_MACBYTES + data.size(), '\0'
+    );
+    auto* nonce = reinterpret_cast<unsigned char*>(result.data());
+    randombytes_buf(nonce, crypto_secretbox_NONCEBYTES);
+    crypto_secretbox_easy(
+        nonce + crypto_secretbox_NONCEBYTES,
+        reinterpret_cast<const unsigned char*>(data.data()),
+        data.size(), nonce, key
+    );
+    sodium_memzero(key, sizeof key);
     return result;
 }
 

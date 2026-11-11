@@ -6,3 +6,4 @@ build/*
 .tasks
 .log
 secrets.conf
+.key

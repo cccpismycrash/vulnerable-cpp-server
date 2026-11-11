@@ -11,6 +11,7 @@ add_executable(server
 )
 
 target_include_directories(server PRIVATE ${CMAKE_SOURCE_DIR})
+target_link_libraries(server PRIVATE sodium)
 
 # Optional: enable sanitizers for testing (uncomment if needed)
 # target_compile_options(server PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
