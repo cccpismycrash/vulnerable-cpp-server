@@ -66,6 +66,32 @@ std::optional<std::string> encrypt(const std::string& data) {
     return result;
 }
 
+std::optional<std::string> decrypt(const std::string& data) {
+    if (sodium_init() < 0) return std::nullopt;
+    if (data.size() < crypto_secretbox_NONCEBYTES + crypto_secretbox_MACBYTES)
+        return std::nullopt;
+    unsigned char key[crypto_secretbox_KEYBYTES];
+    std::ifstream file(".key", std::ios::binary);
+    if (!file.read(reinterpret_cast<char*>(key), sizeof key))
+        return std::nullopt;
+    auto* nonce = reinterpret_cast<const unsigned char*>(data.data());
+    auto* ciphertext = nonce + crypto_secretbox_NONCEBYTES;
+    std::string result(
+        data.size() - crypto_secretbox_NONCEBYTES - crypto_secretbox_MACBYTES,
+        '\0'
+    );
+    int status = crypto_secretbox_open_easy(
+        reinterpret_cast<unsigned char*>(result.data()),
+        ciphertext,
+        data.size() - crypto_secretbox_NONCEBYTES,
+        nonce,
+        key
+    );
+    sodium_memzero(key, sizeof key);
+    if (status != 0) return std::nullopt;
+    return result;
+}
+
 namespace fs = std::filesystem;
 std::optional<fs::path> valid_path(const std::string& filename) {
     try {
