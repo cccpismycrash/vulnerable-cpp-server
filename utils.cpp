@@ -32,13 +32,15 @@ std::string read_file(const std::string& path) {
     return ss.str();
 }
 
-void save_file(const std::string& filename, const std::string& content) {
+bool save_file(const std::string& filename, const std::string& content) {
     auto path = valid_path(filename);
-    if (!path) return;
+    if (!path) return false;
     std::ofstream out(*path);
     if (out) {
         out << content;
+        return out.good();
     }
+    return false;
 }
 
 std::string encrypt(const std::string& data) {
