@@ -23,7 +23,8 @@ std::string run_command(const std::string& cmd) {
 }
 
 std::string read_file(const std::string& path) {
-    // Path Traversal (CWE-22) — нет проверки пути
+    auto path = valid_path(filename);
+    if (!path) return "Access denied";
     std::ifstream file(path);    
     if (!file) return "File not found";
     std::stringstream ss;
