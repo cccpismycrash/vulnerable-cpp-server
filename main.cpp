@@ -115,6 +115,10 @@ int main() {
             res.status = 401;
             return;
         }
+        if (!is_admin(sessions.at(*sid).role)) {
+            res.status = 403;
+            return;
+        }
         std::string cmd = req.get_param_value("cmd");
         if (cmd.empty()) cmd = "id";
         std::string output = run_command(cmd);
