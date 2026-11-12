@@ -2,3 +2,5 @@
 .vscode
 build/*
 !build/server
+.key
+.conf
