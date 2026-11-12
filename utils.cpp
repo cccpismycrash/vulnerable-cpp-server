@@ -23,13 +23,14 @@ std::string run_command(const std::string& cmd) {
     if (cmd == "ls") {
         return "documents\nuploads\nconfig.txt\n";
     }
+    return "Unsupported command\n";
 }
 
-std::string read_file(const std::string& path) {
+std::optional<std::string> read_file(const std::string& filename   ) {
     auto path = valid_path(filename);
-    if (!path) return "Access denied";
-    std::ifstream file(path);    
-    if (!file) return "File not found";
+    if (!path) return std::nullopt;
+    std::ifstream file(*path);    
+    if (!file) return std::nullopt;
     std::stringstream ss;
     ss << file.rdbuf();
     return ss.str();

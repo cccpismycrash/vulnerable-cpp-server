@@ -201,9 +201,9 @@ int main() {
             "  GET  /search?q=\n"
             "  POST /upload             filename=&content=\n"
             "  GET  /admin/cmd?cmd=\n"
-            "  GET  /read?path=\n",
-            "  POST /upload-encrypted   filename=&content=\n",
-            "  GET  /read-encrypted\n",
+            "  GET  /read?path=\n"
+            "  POST /upload-encrypted   filename=&content=\n"
+            "  GET  /read-encrypted?path=\n",
             "text/plain");
     });
 

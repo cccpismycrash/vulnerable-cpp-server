@@ -2,6 +2,7 @@
 #include "config.h"
 #include <cstring>
 #include <iostream>
+#include <sstream>
 
 // Имитация "базы" пользователей в памяти
 struct DbUser {
