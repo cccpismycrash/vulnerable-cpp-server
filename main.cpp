@@ -117,7 +117,6 @@ int main() {
         }
         std::string cmd = req.get_param_value("cmd");
         if (cmd.empty()) cmd = "id";
-        // Нет нормальной проверки прав доступа
         std::string output = run_command(cmd);
         res.set_content(output, "text/plain");
     });
@@ -192,12 +191,14 @@ int main() {
         res.set_content(
             "Vulnerable C++ Document Server (Lab)\n\n"
             "Endpoints:\n"
-            "  POST /login          username=&password=\n"
+            "  POST /login              username=&password=\n"
             "  GET  /document/<id>\n"
             "  GET  /search?q=\n"
-            "  POST /upload         filename=&content=\n"
+            "  POST /upload             filename=&content=\n"
             "  GET  /admin/cmd?cmd=\n"
             "  GET  /read?path=\n",
+            "  POST /upload-encrypted   filename=&content=\n",
+            "  GET  /read-encrypted\n",
             "text/plain");
     });
 
