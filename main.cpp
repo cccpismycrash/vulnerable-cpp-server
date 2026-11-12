@@ -134,7 +134,12 @@ int main() {
             res.set_content("path required", "text/plain");
             return;
         }
-        res.set_content(read_file(path), "text/plain");
+        auto content = read_file(path);
+        if (!content) {
+            res.status = 404;
+            return;
+        }
+        res.set_content(*content, "text/plain");
     });
 
     // ---------- Сохранение файла с шифрованием ----------
