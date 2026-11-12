@@ -39,6 +39,21 @@ std::optional<User> login(const std::string& username, const std::string& passwo
     return std::nullopt;
 }
 
+std::optional<std::string> get_session(const std::string& cookie) {
+    if (cookie.empty()) return std::nullopt;
+
+    std::istringstream stream(cookie);
+    std::string key, value;
+
+    std::getline(stream, key, '=');
+    std::getline(stream, value, ';');
+
+    if (key != "session" || value.empty())
+        return std::nullopt;
+
+    return value;
+}
+
 bool is_admin(const std::string& role) {
     // Broken Access Control — очень слабая проверка (CWE-284 / CWE-862)
     return role == "admin";

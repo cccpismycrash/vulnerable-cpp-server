@@ -48,27 +48,12 @@ int main() {
             int id = std::stoi(req.matches[1].str());
             
             // идентифицируем пользователя по сессионной куке
-            std::string cookie = req.get_header_value("Cookie");
-            if (cookie.empty()) {
+            auto sid = get_session(req.get_header_value("Cookie"));
+            if (!sid || sessions.find(*sid) == sessions.end()) {
                 res.status = 401;
-                res.set_content("Unauthorized", "text/plain");
                 return;
             }
-            std::istringstream stream(cookie);
-            std::string key, value;
-            std::getline(stream, key, '=');
-            std::getline(stream, value, ';');
-            if (key != "session") {
-                res.status = 401;
-                res.set_content("Unauthorized", "text/plain");
-                return;
-            }
-            auto it = sessions.find(value);
-            if (value.empty() || it == sessions.end()) {
-                res.status = 401;
-                res.set_content("Unauthorized", "text/plain");
-                return;
-            }
+            auto it = sessions.find(*sid);
             User user = it->second;
             auto* doc = get_document(id, &user);
             if (doc) {
@@ -91,6 +76,11 @@ int main() {
 
     // ---------- Поиск (Format String) ----------
     svr.Get("/search", [](const httplib::Request& req, httplib::Response& res) {
+        auto sid = get_session(req.get_header_value("Cookie"));
+        if (!sid || sessions.find(*sid) == sessions.end()) {
+            res.status = 401;
+            return;
+        }
         std::string q = req.get_param_value("q");
         if (q.empty()) q = "empty";
         res.set_content(search_documents(q), "text/html");
@@ -98,6 +88,11 @@ int main() {
 
     // ---------- Загрузка файла (Path Traversal) ----------
     svr.Post("/upload", [](const httplib::Request& req, httplib::Response& res) {
+        auto sid = get_session(req.get_header_value("Cookie"));
+        if (!sid || sessions.find(*sid) == sessions.end()) {
+            res.status = 401;
+            return;
+        }
         std::string filename = req.get_param_value("filename");
         std::string content = req.get_param_value("content");
         if (filename.empty()) {
@@ -115,6 +110,11 @@ int main() {
 
     // ---------- Админская команда (Command Injection) ----------
     svr.Get("/admin/cmd", [](const httplib::Request& req, httplib::Response& res) {
+        auto sid = get_session(req.get_header_value("Cookie"));
+        if (!sid || sessions.find(*sid) == sessions.end()) {
+            res.status = 401;
+            return;
+        }
         std::string cmd = req.get_param_value("cmd");
         if (cmd.empty()) cmd = "id";
         // Нет нормальной проверки прав доступа
@@ -124,6 +124,11 @@ int main() {
 
     // ---------- Чтение произвольного файла ----------
     svr.Get("/read", [](const httplib::Request& req, httplib::Response& res) {
+        auto sid = get_session(req.get_header_value("Cookie"));
+        if (!sid || sessions.find(*sid) == sessions.end()) {
+            res.status = 401;
+            return;
+        }
         std::string path = req.get_param_value("path");
         if (path.empty()) {
             res.status = 400;
@@ -135,6 +140,11 @@ int main() {
 
     // ---------- Сохранение файла с шифрованием ----------
     svr.Post("/upload-encrypted", [](const auto& req, auto& res) {
+        auto sid = get_session(req.get_header_value("Cookie"));
+        if (!sid || sessions.find(*sid) == sessions.end()) {
+            res.status = 401;
+            return;
+        }
         std::string filename = req.get_param_value("filename");
         std::string content = req.get_param_value("content");
         if (filename.empty()) {
@@ -152,6 +162,11 @@ int main() {
     
     // ---------- Чтение с дешифрованием ----------
     svr.Get("/read-encrypted", [](const auto& req, auto& res) {
+        auto sid = get_session(req.get_header_value("Cookie"));
+        if (!sid || sessions.find(*sid) == sessions.end()) {
+            res.status = 401;
+            return;
+        }
         std::string filename = req.get_param_value("path");
         if (filename.empty()) {
             res.status = 400;
