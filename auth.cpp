@@ -2,6 +2,7 @@
 #include "config.h"
 #include <cstring>
 #include <iostream>
+#include <sstream>
 
 // Имитация "базы" пользователей в памяти
 struct DbUser {
@@ -18,13 +19,18 @@ static DbUser users[] = {
 };
 
 std::optional<User> login(const std::string& username, const std::string& password) {
-    // Buffer Overflow (CWE-120) + небезопасное сравнение
     char user_buf[32];
     char pass_buf[32];
 
-    // Намеренно опасные вызовы
-    strcpy(user_buf, username.c_str());
-    strcpy(pass_buf, password.c_str());
+    if (
+        username.size() >= sizeof(user_buf) ||
+        password.size() >= sizeof(pass_buf)
+    ) {
+        return std::nullopt;
+    }
+
+    std::memcpy(user_buf, username.c_str(), username.size() + 1);
+    std::memcpy(pass_buf, password.c_str(), password.size() + 1);
 
     for (const auto& u : users) {
         if (strcmp(user_buf, u.username) == 0 && strcmp(pass_buf, u.password) == 0) {
@@ -32,6 +38,21 @@ std::optional<User> login(const std::string& username, const std::string& passwo
         }
     }
     return std::nullopt;
+}
+
+std::optional<std::string> get_session(const std::string& cookie) {
+    if (cookie.empty()) return std::nullopt;
+
+    std::istringstream stream(cookie);
+    std::string key, value;
+
+    std::getline(stream, key, '=');
+    std::getline(stream, value, ';');
+
+    if (key != "session" || value.empty())
+        return std::nullopt;
+
+    return value;
 }
 
 bool is_admin(const std::string& role) {

@@ -2,5 +2,8 @@
 .vscode
 build/*
 !build/server
+.txt
+.tasks
+.log
+secrets.conf
 .key
-.conf

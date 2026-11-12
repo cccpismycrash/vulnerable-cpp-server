@@ -1,0 +1,3 @@
+pvs-studio.com/en/docs/warnings/	1	err	Help: The documentation for all analyzer warnings is available here: https://pvs-studio.com/en/docs/warnings/.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/documents.cpp	34	warn	V618 [CWE-134] It's dangerous to call the 'snprintf' function in such a manner, as the line being passed could contain format specification. The example of the safe code: printf("%s", str);
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/documents.cpp	38	warn	V618 [CWE-134] It's dangerous to call the 'sprintf' function in such a manner, as the line being passed could contain format specification. The example of the safe code: printf("%s", str);

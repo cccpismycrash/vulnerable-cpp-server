@@ -12,10 +12,12 @@ void init_documents() {
     docs.push_back({3, 3, "bob_data.txt", "Bob information"});
 }
 
-Document* get_document(int id) {
-    // IDOR (CWE-639) — нет проверки владельца / прав доступа
+Document* get_document(int id, const User* user) {
+    if (user == nullptr)
+        return nullptr;
+
     for (auto& d : docs) {
-        if (d.id == id) {
+        if (d.id == id && d.owner_id == user->id) {
             return &d;
         }
     }
@@ -28,14 +30,13 @@ void add_document(int owner_id, const std::string& filename, const std::string& 
 }
 
 std::string search_documents(const std::string& query) {
-    // Format String Vulnerability (CWE-134)
+
     char buffer[256];
-    // Намеренно опасно: пользовательский ввод как format-string
-    snprintf(buffer, sizeof(buffer), query.c_str());  // всё равно опасно при %n и т.п.
+
+    snprintf(buffer, sizeof(buffer), "%s", query.c_str());
     
-    // Более явная уязвимость:
     char result_buf[512];
-    sprintf(result_buf, query.c_str());   // CWE-134
+    snprintf(result_buf, sizeof(result_buf), "%s", query.c_str());
 
     std::string result = "Search results for: ";
     result += result_buf;

@@ -7,12 +7,18 @@
 #include <map>
 #include <string>
 #include <filesystem>
+#include <sstream>
 
 namespace fs = std::filesystem;
 
 std::map<std::string, User> sessions;   // session_id → user
 
 int main() {
+
+    if (Config::load() != 0) {
+        return 1;
+    }
+
     // Создаём папку для загрузок
     fs::create_directories(Config::UPLOAD_DIR);
 
@@ -40,8 +46,22 @@ int main() {
     svr.Get(R"(/document/(\d+))", [](const httplib::Request& req, httplib::Response& res) {
         try {
             int id = std::stoi(req.matches[1].str());
-            auto* doc = get_document(id);
+            
+            // идентифицируем пользователя по сессионной куке
+            auto sid = get_session(req.get_header_value("Cookie"));
+            if (!sid || sessions.find(*sid) == sessions.end()) {
+                res.status = 401;
+                return;
+            }
+            auto it = sessions.find(*sid);
+            User user = it->second;
+            auto* doc = get_document(id, &user);
             if (doc) {
+                if (doc->owner_id != user.id && user.role != "admin") {
+                    res.status = 403;
+                    res.set_content("Forbidden", "text/plain");
+                    return;
+                }
                 res.set_content("File: " + doc->filename + "\nOwner ID: " + std::to_string(doc->owner_id) +
                                 "\n\n" + doc->content, "text/plain");
             } else {
@@ -56,6 +76,11 @@ int main() {
 
     // ---------- Поиск (Format String) ----------
     svr.Get("/search", [](const httplib::Request& req, httplib::Response& res) {
+        auto sid = get_session(req.get_header_value("Cookie"));
+        if (!sid || sessions.find(*sid) == sessions.end()) {
+            res.status = 401;
+            return;
+        }
         std::string q = req.get_param_value("q");
         if (q.empty()) q = "empty";
         res.set_content(search_documents(q), "text/html");
@@ -63,6 +88,11 @@ int main() {
 
     // ---------- Загрузка файла (Path Traversal) ----------
     svr.Post("/upload", [](const httplib::Request& req, httplib::Response& res) {
+        auto sid = get_session(req.get_header_value("Cookie"));
+        if (!sid || sessions.find(*sid) == sessions.end()) {
+            res.status = 401;
+            return;
+        }
         std::string filename = req.get_param_value("filename");
         std::string content = req.get_param_value("content");
         if (filename.empty()) {
@@ -70,28 +100,99 @@ int main() {
             res.set_content("filename required", "text/plain");
             return;
         }
-        save_file(filename, content);
+        if (!save_file(filename, content)) {
+            res.status = 403;
+            res.set_content("Access denied or save failed", "text/plain");
+            return;
+        }
         res.set_content("Uploaded: " + filename, "text/plain");
     });
 
     // ---------- Админская команда (Command Injection) ----------
     svr.Get("/admin/cmd", [](const httplib::Request& req, httplib::Response& res) {
+        auto sid = get_session(req.get_header_value("Cookie"));
+        if (!sid || sessions.find(*sid) == sessions.end()) {
+            res.status = 401;
+            return;
+        }
+        if (!is_admin(sessions.at(*sid).role)) {
+            res.status = 403;
+            return;
+        }
         std::string cmd = req.get_param_value("cmd");
         if (cmd.empty()) cmd = "id";
-        // Нет нормальной проверки прав доступа
         std::string output = run_command(cmd);
         res.set_content(output, "text/plain");
     });
 
     // ---------- Чтение произвольного файла ----------
     svr.Get("/read", [](const httplib::Request& req, httplib::Response& res) {
+        auto sid = get_session(req.get_header_value("Cookie"));
+        if (!sid || sessions.find(*sid) == sessions.end()) {
+            res.status = 401;
+            return;
+        }
         std::string path = req.get_param_value("path");
         if (path.empty()) {
             res.status = 400;
             res.set_content("path required", "text/plain");
             return;
         }
-        res.set_content(read_file(path), "text/plain");
+        auto content = read_file(path);
+        if (!content) {
+            res.status = 404;
+            return;
+        }
+        res.set_content(*content, "text/plain");
+    });
+
+    // ---------- Сохранение файла с шифрованием ----------
+    svr.Post("/upload-encrypted", [](const auto& req, auto& res) {
+        auto sid = get_session(req.get_header_value("Cookie"));
+        if (!sid || sessions.find(*sid) == sessions.end()) {
+            res.status = 401;
+            return;
+        }
+        std::string filename = req.get_param_value("filename");
+        std::string content = req.get_param_value("content");
+        if (filename.empty()) {
+            res.status = 400;
+            return;
+        }
+        auto encrypted = encrypt(content);
+        if (!encrypted || !save_file(filename, *encrypted)) {
+            res.status = 400;
+            res.set_content("Encryption or saving failed", "text/plain");
+            return;
+        }
+        res.set_content("Encrypted file saved", "text/plain");
+    });
+    
+    // ---------- Чтение с дешифрованием ----------
+    svr.Get("/read-encrypted", [](const auto& req, auto& res) {
+        auto sid = get_session(req.get_header_value("Cookie"));
+        if (!sid || sessions.find(*sid) == sessions.end()) {
+            res.status = 401;
+            return;
+        }
+        std::string filename = req.get_param_value("path");
+        if (filename.empty()) {
+            res.status = 400;
+            return;
+        }
+        auto content = read_file(filename);
+        if (!content) {
+            res.status = 404;
+            res.set_content("File not found or access denied", "text/plain");
+            return;
+        }
+        auto decrypted = decrypt(*content);
+        if (!decrypted) {
+            res.status = 400;
+            res.set_content("Decryption failed", "text/plain");
+            return;
+        }
+        res.set_content(*decrypted, "text/plain");
     });
 
     // ---------- Простая главная ----------
@@ -99,12 +200,14 @@ int main() {
         res.set_content(
             "Vulnerable C++ Document Server (Lab)\n\n"
             "Endpoints:\n"
-            "  POST /login          username=&password=\n"
+            "  POST /login              username=&password=\n"
             "  GET  /document/<id>\n"
             "  GET  /search?q=\n"
-            "  POST /upload         filename=&content=\n"
+            "  POST /upload             filename=&content=\n"
             "  GET  /admin/cmd?cmd=\n"
-            "  GET  /read?path=\n",
+            "  GET  /read?path=\n"
+            "  POST /upload-encrypted   filename=&content=\n"
+            "  GET  /read-encrypted?path=\n",
             "text/plain");
     });
 
