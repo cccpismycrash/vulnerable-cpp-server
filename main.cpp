@@ -133,6 +133,45 @@ int main() {
         res.set_content(read_file(path), "text/plain");
     });
 
+    // ---------- Сохранение файла с шифрованием ----------
+    svr.Post("/upload-encrypted", [](const auto& req, auto& res) {
+        std::string filename = req.get_param_value("filename");
+        std::string content = req.get_param_value("content");
+        if (filename.empty()) {
+            res.status = 400;
+            return;
+        }
+        auto encrypted = encrypt(content);
+        if (!encrypted || !save_file(filename, *encrypted)) {
+            res.status = 400;
+            res.set_content("Encryption or saving failed", "text/plain");
+            return;
+        }
+        res.set_content("Encrypted file saved", "text/plain");
+    });
+    
+    // ---------- Чтение с дешифрованием ----------
+    svr.Get("/read-encrypted", [](const auto& req, auto& res) {
+        std::string filename = req.get_param_value("path");
+        if (filename.empty()) {
+            res.status = 400;
+            return;
+        }
+        auto content = read_file(filename);
+        if (!content) {
+            res.status = 404;
+            res.set_content("File not found or access denied", "text/plain");
+            return;
+        }
+        auto decrypted = decrypt(*content);
+        if (!decrypted) {
+            res.status = 400;
+            res.set_content("Decryption failed", "text/plain");
+            return;
+        }
+        res.set_content(*decrypted, "text/plain");
+    });
+
     // ---------- Простая главная ----------
     svr.Get("/", [](const httplib::Request&, httplib::Response& res) {
         res.set_content(
