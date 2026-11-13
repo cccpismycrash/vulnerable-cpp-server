@@ -1,0 +1,35 @@
+pvs-studio.com/en/docs/warnings/	1	err	Help: The documentation for all analyzer warnings is available here: https://pvs-studio.com/en/docs/warnings/.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	5817	err	V522 Dereferencing of the null pointer 'data' might take place. The null pointer is passed into 'send_frame' function. Inspect the second argument. Check lines: 5817, 23312, 23520.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	7967	err	V547 Expression 'type == EncodingType::None' is always true.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	7867	err	V797 The 'rfind' function is used as if it returned a bool type. The return value of the function should probably be compared with std::string::npos.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	14257	err	V1047 Lifetime of the lambda is greater than lifetime of the local variable 'boundary' captured by reference.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	14257	err	V1047 Lifetime of the lambda is greater than lifetime of the local variable 'content_type' captured by reference.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	17071	err	V1047 Lifetime of the lambda is greater than lifetime of the local variable 'cur_item' captured by reference.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	17071	err	V1047 Lifetime of the lambda is greater than lifetime of the local variable 'cur_start' captured by reference.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	7402	warn	V506 Pointer to local variable 'addr' is stored outside the scope of this variable. Such a pointer will become invalid.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	16349	warn	V519 The 'it' variable is assigned values twice successively. Perhaps this is a mistake. Check lines: 16348, 16349.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	8790	warn	V547 Expression 'decompressor' is always false.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	9194	warn	V547 Expression '!payload.empty()' is always false.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	14142	warn	V547 Expression '!compressor' is always true.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	14721	warn	V547 Expression 'content_reader_payload_too_large' is always false.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	14835	warn	V547 Expression '!compressor' is always true.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	14926	warn	V547 Expression 'detail::make_compressor(type)' is always false.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	15983	warn	V547 Expression '!handle.decompressor_' is always true.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	5194	warn	V560 A part of conditional expression is always true: (16 * 1024 * 1024) > 0.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	7547	warn	V560 A part of conditional expression is always false: err == 11.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	9007	warn	V560 A part of conditional expression is always true: !finished.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	10216	warn	V560 A part of conditional expression is always true: 1024 > 0.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	14189	warn	V560 A part of conditional expression is always true: 1024 > 0.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	14220	warn	V560 A part of conditional expression is always true: 8192 > 0.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	16856	warn	V560 A part of conditional expression is always true: 1024 > 0.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	23409	warn	V560 A part of conditional expression is always true: 16777216 > 0.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	7687	warn	V641 The size of the '& addr' buffer is not a multiple of the element size of the type 'const struct sockaddr_in6'.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	14544	warn	V641 The size of the '& addr' buffer is not a multiple of the element size of the type 'struct sockaddr_in6'.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	8597	warn	V747 An odd expression inside parenthesis. It is possible that a function name is missing.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	18125	warn	V779 Unreachable code detected. It is possible that an error is present.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	17071	warn	V788 The variable 'cur_item', captured in a lambda expression, has a constant value.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	17071	warn	V788 The variable 'cur_start', captured in a lambda expression, has a constant value.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	8840	warn	V1048 The 'ret' variable was assigned the same value.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	8851	warn	V1048 The 'ret' variable was assigned the same value.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	12705	warn	V1051 Consider checking for misprints. It's possible that the 'size' should be checked here.
+/mnt/c/Users/egakr/Desktop/Магистратура/3 сем/Безопасная разработка/лабы/4/cpp_secure_lab/httplib.h	23545	warn	V1077 Conditional initialization inside the 'WebSocketClient' constructor may leave some members uninitialized. Inspect the following: port_.
